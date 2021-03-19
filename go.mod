@@ -1,4 +1,4 @@
-module github.com/eclanp/multiavatar-go
+module github.com/Flyclops/multiavatar-go
 
 go 1.15
 
