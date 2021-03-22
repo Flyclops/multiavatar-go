@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"github.com/lucasb-eyer/go-colorful"
 	"math"
 	"regexp"
 	"strconv"
@@ -636,12 +635,15 @@ func SvgCode(avatarId string, opts Options) (svg string, err error) {
 		colors := themes[v[0]][v[1]][k]
 		var svgPart string
 		if k == "env" {
-			svgPart = env + circle
-			circleColor := gamut.Hex(colors[0]).(colorful.Color)
-			bgColor := gamut.Darker(circleColor, .3).(colorful.Color)
-			colors = []string{
-				getHex(bgColor),
-				getHex(circleColor),
+			svgPart = circle
+			if opts.Square {
+				svgPart = env + circle
+				circleColor := gamut.Hex(colors[0]).(colorful.Color)
+				bgColor := gamut.Darker(circleColor, .3).(colorful.Color)
+				colors = []string{
+					getHex(bgColor),
+					getHex(circleColor),
+				}
 			}
 		} else if k == "head" {
 			svgPart = head
