@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"github.com/lucasb-eyer/go-colorful"
 	"math"
 	"regexp"
 	"strconv"
