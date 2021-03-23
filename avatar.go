@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/lucasb-eyer/go-colorful"
+	"log"
 	"math"
 	"regexp"
 	"strconv"
@@ -592,6 +593,8 @@ func SvgCode(avatarId string, opts Options) (svg string, err error) {
 	s := hex.EncodeToString(sum)
 	reg := regexp.MustCompile("[0-9]")
 	hash := reg.FindAllString(s, -1)[0:12]
+
+	log.Println("MAV:", avatarId, hash)
 
 	var p = make(map[string][2]int, 6)
 	var num int
