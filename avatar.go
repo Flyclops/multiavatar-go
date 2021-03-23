@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/lucasb-eyer/go-colorful"
-	"log"
 	"math"
 	"regexp"
 	"strconv"
@@ -16,15 +15,13 @@ import (
 )
 
 type Options struct {
-	Theme  int
-	Part   int
-	Square bool
+	Theme int
+	Part  int
 }
 
 var svgStart = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 231 231">`
 var svgEnd = `</svg>`
 
-// var env = `<path d="M33.83,33.83a115.5,115.5,0,1,1,0,163.34,115.49,115.49,0,0,1,0-163.34Z" style="fill:#01;"/>`
 var env = `<rect x="0" y="0" width="231" height="231" style="fill:#01;" />`
 var circle = `<path d="M33.83,33.83a115.5,115.5,0,1,1,0,163.34,115.49,115.49,0,0,1,0-163.34Z" style="fill:#01;"/>`
 var head = `<path d="m115.5 51.75a63.75 63.75 0 0 0-10.5 126.63v14.09a115.5 115.5 0 0 0-53.729 19.027 115.5 115.5 0 0 0 128.46 0 115.5 115.5 0 0 0-53.729-19.029v-14.084a63.75 63.75 0 0 0 53.25-62.881 63.75 63.75 0 0 0-63.65-63.75 63.75 63.75 0 0 0-0.09961 0z" style="fill:#000;"/>`
@@ -581,7 +578,7 @@ func init() {
 	}
 }
 
-func SvgCode(avatarId string, opts Options) (svg string, err error) {
+func SvgCode(avatarId string, square bool, opts *Options) (svg string, err error) {
 	if avatarId == "" {
 		err = errors.New("avatar id is required")
 		return
@@ -593,8 +590,6 @@ func SvgCode(avatarId string, opts Options) (svg string, err error) {
 	s := hex.EncodeToString(sum)
 	reg := regexp.MustCompile("[0-9]")
 	hash := reg.FindAllString(s, -1)[0:12]
-
-	log.Println("MAV:", avatarId, hash)
 
 	var p = make(map[string][2]int, 6)
 	var num int
@@ -634,15 +629,13 @@ func SvgCode(avatarId string, opts Options) (svg string, err error) {
 	}
 	p["top"] = getKey(int(math.Floor(.47*float64(num)+.5)), opts)
 
-	log.Printf("MAV: %#v\n", p)
-
 	var final = make(map[string]string, 6)
 	for k, v := range p {
 		colors := themes[v[0]][v[1]][k]
 		var svgPart string
 		if k == "env" {
 			svgPart = circle
-			if opts.Square {
+			if square {
 				svgPart = env + circle
 				circleColor := gamut.Hex(colors[0]).(colorful.Color)
 				bgColor := gamut.Darker(circleColor, .3).(colorful.Color)
@@ -676,40 +669,21 @@ func SvgCode(avatarId string, opts Options) (svg string, err error) {
 	builder.WriteString(svgEnd)
 	svg = builder.String()
 
-	log.Printf("MAV: %s\n", svg)
-
 	return
 }
 
-func getKey(v int, opts Options) [2]int {
-	p := opts.Part
-	t := opts.Theme
+func getKey(v int, opts *Options) [2]int {
+	if opts != nil {
+		return [2]int{opts.Part, opts.Theme}
+	}
 
 	if v > 31 {
-		return [2]int{
-			getV(p, v-32),
-			getV(t, 2),
-		}
+		return [2]int{v - 32, 2}
 	} else if v > 15 {
-		return [2]int{
-			getV(p, v-16),
-			getV(t, 1),
-		}
+		return [2]int{v - 16, 1}
 	} else {
-		return [2]int{
-			getV(p, v),
-			getV(t, 0),
-		}
+		return [2]int{v, 0}
 	}
-}
-
-// getV returns the value of the provided int
-// if it's != -1, otherwise the computed value
-func getV(provided, fallback int) int {
-	if provided != -1 {
-		return provided
-	}
-	return fallback
 }
 
 func getHex(c colorful.Color) string {
