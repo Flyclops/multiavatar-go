@@ -634,7 +634,7 @@ func SvgCode(avatarId string, opts Options) (svg string, err error) {
 	}
 	p["top"] = getKey(int(math.Floor(.47*float64(num)+.5)), opts)
 
-	log.Printf("%#v\n", p)
+	log.Printf("MAV: %#v\n", p)
 
 	var final = make(map[string]string, 6)
 	for k, v := range p {
@@ -676,7 +676,7 @@ func SvgCode(avatarId string, opts Options) (svg string, err error) {
 	builder.WriteString(svgEnd)
 	svg = builder.String()
 
-	log.Println(svg)
+	log.Printf("MAV: %s\n", svg)
 
 	return
 }
